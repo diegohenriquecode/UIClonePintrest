@@ -1,29 +1,58 @@
 const grids = document.querySelectorAll('.grid');
-const grids = document.querySelectorAll('.heading .wrapper .text');
+const headings = document.querySelectorAll('.heading .wrapper .text');
 
 function enterScreen(index) {
-    const grid = grids[index]
-    const heading = headings[index]
-    const gridColumns = grid.querySelectorAll('.column')
+    const grid = grids[index];
+    const heading = headings[index];
+    const gridColumns = grid.querySelectorAll('.column');
 
-    grid.classList.add('active')
+    grid.classList.add('active');
 
     gridColumns.forEach(element => {
-        element.classList.remove('animate-before')
+        element.classList.remove('animate-before', 'animate-after');
     })
-}
-function exitScreen(index, exitDelay) {}
 
-function setUpAnimationCycle({
-    initialScreenIndex, 
-    timePerScreen, 
-    exitDelay
-}) {
-    enterScreen(initialScreenIndex)
+    heading.classList.remove('animate-before', 'animate-after');
+
+}
+function exitScreen(index, exitDelay) {
+    const grid = grids[index];
+    const heading = headings[index];
+    const gridColumns = grid.querySelectorAll('.column');
+
+    gridColumns.forEach(element => {
+        element.classList.add('animate-after');
+    });
+
+    setTimeout( () => {
+        grid.classList.remove('active');
+    }, exitDelay);
+
+    heading.classList.add('animate-after');
+}
+
+function setUpAnimationCycle({timePerScreen, exitDelay}) {
+    const cycleTime = timePerScreen + exitDelay;
+    let nextIndex = 0;
+
+    function nextCycle() {
+        const currentIndex = nextIndex;
+
+        enterScreen(currentIndex)
+
+        setTimeout(() => exitScreen(currentIndex, exitDelay), timePerScreen)
+
+        nextIndex = nextIndex >= grids.length - 1 ? 0 : nextIndex + 1;
+    }
+
+    nextCycle();
+
+    setInterval(nextCycle, cycleTime);
+
 }
 
 setUpAnimationCycle({
-    initialScreenIndex: 0,
+    
     timePerScreen: 2000,
     exitDelay: 200 * 7
-})
+});
